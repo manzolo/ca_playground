@@ -1,3 +1,3 @@
-docker compose run --rm root-ca
-docker compose run --rm intermediate-ca
-docker compose run --rm server-ca
+docker compose run --remove-orphans --rm root-ca
+docker compose run --remove-orphans --rm intermediate-ca
+docker compose run --remove-orphans --rm server-ca
