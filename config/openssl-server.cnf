@@ -35,8 +35,8 @@ ST                     = Toscana
 L                      = Scarperia e San Piero
 O                      = Manzolo Organization
 OU                     = Manzolo Web Server
-CN                     = www.example.com
-emailAddress           = webmaster@example.com
+CN                     = $ENV::CN
+emailAddress           = $ENV::EMAIL
 
 [ v3_server ]
 basicConstraints = CA:FALSE
@@ -45,5 +45,5 @@ extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = www.example.com
-DNS.2 = example.com
+DNS.1 = www.$ENV::CN
+DNS.2 = $ENV::CN
