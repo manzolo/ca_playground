@@ -30,13 +30,13 @@ default_md             = sha256
 distinguished_name     = dn
 
 [ dn ]
-C                      = IT
-ST                     = Toscana
-L                      = Scarperia e San Piero
-O                      = Manzolo Home
-OU                     = Manzolo Intermediate One CA
-CN                     = Manzolo Intermediate One Certification Authority
-emailAddress           = intermediate@manzolo.org
+C                      = $ENV::C_INTERMEDIATE1
+ST                     = $ENV::ST_INTERMEDIATE1
+L                      = $ENV::L_INTERMEDIATE1
+O                      = $ENV::O_INTERMEDIATE1
+OU                     = $ENV::OU_INTERMEDIATE1
+CN                     = $ENV::CN_INTERMEDIATE1
+emailAddress           = $ENV::EMAIL_INTERMEDIATE1
 
 [ v3_intermediate_ca ]
 basicConstraints = CA:TRUE, pathlen:0

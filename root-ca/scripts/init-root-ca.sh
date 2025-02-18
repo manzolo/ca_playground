@@ -18,7 +18,9 @@ else
     cp /etc/ssl/openssl.cnf /manzoloCA/openssl.cnf
 
     # Genera la CA root
-    openssl req -config /manzoloCA/openssl.cnf -new -x509 -days 3650 \
+    openssl req -config /manzoloCA/openssl.cnf  \
+    -extensions v3_ca \
+    -new -x509 -days 3650 \
     -keyout /manzoloCA/private/CA_ROOT.key.pem \
     -out /manzoloCA/certs/CA_ROOT.cert.pem \
     -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo Root CA/CN=Manzolo Root Certification Authority" \

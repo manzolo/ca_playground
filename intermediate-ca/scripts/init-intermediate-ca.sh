@@ -35,6 +35,9 @@ else
         -out /manzoloCA/intermediate/certs/CA_INTERMEDIATE.cert.pem \
         -passin pass:manzolo \
         -batch  # Conferme automatiche
+    
+    cat /manzoloCA/intermediate/certs/CA_INTERMEDIATE.cert.pem > /manzoloCA/intermediate/certs/FULL_CHAIN_CA_INTERMEDIATE.cert.pem
+    cat /manzoloCA/certs/CA_ROOT.cert.pem >> /manzoloCA/intermediate/certs/FULL_CHAIN_CA_INTERMEDIATE.cert.pem
 
     echo "CA Intermedia configurata con successo!"
 fi

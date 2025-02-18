@@ -18,7 +18,14 @@ services:
       - ./shared-data/intermediate-ca:/manzoloCA/intermediate
     environment:
       - CN=${CN}
-      - EMAIL=${EMAIL}  
+      - EMAIL=${EMAIL}
+      - C_INTERMEDIATE1=${C_INTERMEDIATE1}
+      - ST_INTERMEDIATE1=${ST_INTERMEDIATE1}
+      - L_INTERMEDIATE1=${L_INTERMEDIATE1}
+      - O_INTERMEDIATE1=${O_INTERMEDIATE1}
+      - OU_INTERMEDIATE1=${OU_INTERMEDIATE1}
+      - CN_INTERMEDIATE1=${CN_INTERMEDIATE1}
+      - EMAIL_INTERMEDIATE1=${EMAIL_INTERMEDIATE1}
     entrypoint: ["/scripts/init-intermediate-ca.sh"]
 
   server-ca:
@@ -27,6 +34,13 @@ services:
     environment:
       - CN=${CN}
       - EMAIL=${EMAIL}
+      - C_INTERMEDIATE1=${C_INTERMEDIATE1}
+      - ST_INTERMEDIATE1=${ST_INTERMEDIATE1}
+      - L_INTERMEDIATE1=${L_INTERMEDIATE1}
+      - O_INTERMEDIATE1=${O_INTERMEDIATE1}
+      - OU_INTERMEDIATE1=${OU_INTERMEDIATE1}
+      - CN_INTERMEDIATE1=${CN_INTERMEDIATE1}
+      - EMAIL_INTERMEDIATE1=${EMAIL_INTERMEDIATE1}      
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./server-ca/scripts:/scripts
