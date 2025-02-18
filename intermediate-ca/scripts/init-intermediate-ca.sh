@@ -23,7 +23,7 @@ else
     openssl req -config /etc/ssl/openssl.cnf \
         -new -keyout /manzoloCA/intermediate/private/CA_INTERMEDIATE.key.pem \
         -out /manzoloCA/intermediate/csr/CA_INTERMEDIATE.csr.pem \
-        -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Organization/OU=Manzolo Intermediate CA/CN=Manzolo Intermediate Certification Authority" \
+        -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo Intermediate One CA/CN=Manzolo Intermediate One Certification Authority" \
         -passout pass:manzolo1
 
 

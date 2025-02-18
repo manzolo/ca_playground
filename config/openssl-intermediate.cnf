@@ -33,9 +33,9 @@ distinguished_name     = dn
 C                      = IT
 ST                     = Toscana
 L                      = Scarperia e San Piero
-O                      = Manzolo Organization
-OU                     = Manzolo Intermediate CA
-CN                     = Manzolo Intermediate Certification Authority
+O                      = Manzolo Home
+OU                     = Manzolo Intermediate One CA
+CN                     = Manzolo Intermediate One Certification Authority
 emailAddress           = intermediate@manzolo.org
 
 [ v3_intermediate_ca ]
@@ -49,5 +49,4 @@ extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = www.example.com
-DNS.2 = example.com
+DNS.1 = $ENV::CN

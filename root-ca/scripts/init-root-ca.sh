@@ -21,7 +21,7 @@ else
     openssl req -config /manzoloCA/openssl.cnf -new -x509 -days 3650 \
     -keyout /manzoloCA/private/CA_ROOT.key.pem \
     -out /manzoloCA/certs/CA_ROOT.cert.pem \
-    -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Organization/OU=Manzolo Root CA/CN=Manzolo Root Certification Authority" \
+    -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo Root CA/CN=Manzolo Root Certification Authority" \
     -passout pass:manzolo
 
     echo "CA Root configurata con successo!"

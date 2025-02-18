@@ -16,14 +16,17 @@ services:
       - ./intermediate-ca/scripts:/scripts
       - ./shared-data/root-ca:/manzoloCA
       - ./shared-data/intermediate-ca:/manzoloCA/intermediate
+    environment:
+      - CN=${CN}
+      - EMAIL=${EMAIL}  
     entrypoint: ["/scripts/init-intermediate-ca.sh"]
 
   server-ca:
     image: alpine:latest
     container_name: server-ca
     environment:
-      - CN=www.prova.it
-      - EMAIL=manzolo@prova.it
+      - CN=${CN}
+      - EMAIL=${EMAIL}
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./server-ca/scripts:/scripts

@@ -33,8 +33,8 @@ distinguished_name     = dn
 C                      = IT
 ST                     = Toscana
 L                      = Scarperia e San Piero
-O                      = Manzolo Organization
-OU                     = Manzolo Web Server
+O                      = Manzolo Home
+OU                     = Manzolo TLS Cert
 CN                     = $ENV::CN
 emailAddress           = $ENV::EMAIL
 
@@ -45,5 +45,4 @@ extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = www.$ENV::CN
-DNS.2 = $ENV::CN
+DNS.1 = $ENV::CN

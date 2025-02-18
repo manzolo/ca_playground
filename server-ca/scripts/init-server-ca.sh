@@ -15,7 +15,7 @@ else
     openssl req -config /etc/ssl/openssl.cnf -new \
         -keyout /manzoloCA/server/private/${CN}.key.pem \
         -out /manzoloCA/server/csr/${CN}.csr.pem \
-        -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Organization/OU=Manzolo Web Server/CN=${CN}" \
+        -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo TLS Cert/CN=${CN}" \
         -passout pass:manzoloX
 
     # Firma la CSR con la CA intermedia
