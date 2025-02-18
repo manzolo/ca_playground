@@ -1,0 +1,29 @@
+services:
+  root-ca:
+    image: alpine:latest
+    container_name: root-ca
+    volumes:
+      - ./root-ca/openssl-root.cnf:/etc/ssl/openssl.cnf
+      - ./root-ca/scripts:/scripts
+      - ./shared-data/root-ca:/manzoloCA
+    entrypoint: ["/scripts/init-root-ca.sh"]
+
+  intermediate-ca:
+    image: alpine:latest
+    container_name: intermediate-ca
+    volumes:
+      - ./intermediate-ca/openssl-intermediate.cnf:/etc/ssl/openssl.cnf
+      - ./intermediate-ca/scripts:/scripts
+      - ./shared-data/root-ca:/manzoloCA
+      - ./shared-data/intermediate-ca:/manzoloCA/intermediate
+    entrypoint: ["/scripts/init-intermediate-ca.sh"]
+
+  server-ca:
+    image: alpine:latest
+    container_name: server-ca
+    volumes:
+      - ./server-ca/openssl-server.cnf:/etc/ssl/openssl.cnf
+      - ./server-ca/scripts:/scripts
+      - ./shared-data/intermediate-ca:/manzoloCA/intermediate
+      - ./shared-data/server-ca:/manzoloCA/server
+    entrypoint: ["/scripts/init-server-ca.sh"]

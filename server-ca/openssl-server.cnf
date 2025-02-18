@@ -1,0 +1,49 @@
+[ ca ]
+default_ca = CA_SERVER
+
+[ CA_SERVER ]
+dir             = /manzoloCA/intermediate
+certs           = $dir/certs
+crl_dir         = $dir/crl
+new_certs_dir   = $dir/newcerts
+database        = $dir/index.txt
+serial          = $dir/serial
+private_key     = $dir/private/CA_INTERMEDIATE.key.pem
+certificate     = $dir/certs/CA_INTERMEDIATE.cert.pem
+default_days    = 365  # 1 anno
+default_md      = sha256
+policy          = policy_anything
+
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits           = 4096
+prompt                 = no
+default_md             = sha256
+distinguished_name     = dn
+
+[ dn ]
+C                      = IT
+ST                     = Toscana
+L                      = Scarperia e San Piero
+O                      = Manzolo Organization
+OU                     = Manzolo Web Server
+CN                     = www.example.com
+emailAddress           = webmaster@example.com
+
+[ v3_server ]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = www.example.com
+DNS.2 = example.com

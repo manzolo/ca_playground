@@ -1,0 +1,47 @@
+[ ca ]
+default_ca = CA_ROOT
+
+[ CA_ROOT ]
+dir             = /manzoloCA
+certs           = $dir/certs
+crl_dir         = $dir/crl
+new_certs_dir   = $dir/newcerts
+database        = $dir/index.txt
+serial          = $dir/serial
+private_key     = $dir/private/CA_ROOT.key.pem
+certificate     = $dir/certs/CA_ROOT.cert.pem
+default_days    = 3650  # 10 anni
+default_md      = sha256
+policy          = policy_anything
+
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits           = 4096
+prompt                 = no
+default_md             = sha256
+distinguished_name     = dn
+
+[ dn ]
+C                      = IT
+ST                     = Toscana
+L                      = Scarperia e San Piero
+O                      = Manzolo Organization
+OU                     = Manzolo Root CA
+CN                     = Manzolo Root Certification Authority
+emailAddress           = root@manzolo.org
+
+[ v3_ca ]
+basicConstraints = CA:TRUE
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ v3_intermediate_ca ]
+basicConstraints = CA:TRUE, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign

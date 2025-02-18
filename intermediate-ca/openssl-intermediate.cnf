@@ -1,0 +1,53 @@
+[ ca ]
+default_ca = CA_INTERMEDIATE
+
+[ CA_INTERMEDIATE ]
+dir             = /manzoloCA/intermediate
+certs           = $dir/certs
+crl_dir         = $dir/crl
+new_certs_dir   = $dir/newcerts
+database        = $dir/index.txt
+serial          = $dir/serial
+private_key     = $dir/private/CA_INTERMEDIATE.key.pem
+certificate     = $dir/certs/CA_INTERMEDIATE.cert.pem
+default_days    = 1825  # 5 anni
+default_md      = sha256
+policy          = policy_anything
+
+[ policy_anything ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = optional
+organizationalUnitName  = optional
+commonName              = supplied
+emailAddress            = optional
+
+[ req ]
+default_bits           = 4096
+prompt                 = no
+default_md             = sha256
+distinguished_name     = dn
+
+[ dn ]
+C                      = IT
+ST                     = Toscana
+L                      = Scarperia e San Piero
+O                      = Manzolo Organization
+OU                     = Manzolo Intermediate CA
+CN                     = Manzolo Intermediate Certification Authority
+emailAddress           = intermediate@manzolo.org
+
+[ v3_intermediate_ca ]
+basicConstraints = CA:TRUE, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ v3_server ]
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = www.example.com
+DNS.2 = example.com
