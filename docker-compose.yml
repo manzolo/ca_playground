@@ -13,8 +13,6 @@ services:
       - O_ROOT=${O_ROOT}
       - OU_ROOT=${OU_ROOT}
 
-    #entrypoint: ["/scripts/init-root-ca.sh"]
-
   intermediate-ca:
     image: alpine:latest
     container_name: intermediate-ca
@@ -31,7 +29,6 @@ services:
       - O_INTERMEDIATE=${O_INTERMEDIATE}
       - OU_INTERMEDIATE=${OU_INTERMEDIATE}
       - CN_SERVER=${CN_SERVER}
-    #entrypoint: ["/scripts/init-intermediate-ca.sh"]
 
   server-ca:
     image: alpine:latest
@@ -47,4 +44,3 @@ services:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./server-ca/scripts:/scripts
       - ./shared-data/server-ca:/manzoloCA
-    #entrypoint: ["/scripts/init-server-ca.sh"]

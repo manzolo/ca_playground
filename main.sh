@@ -1,80 +1,10 @@
 #!/bin/bash
 
-# Load .env file if it exists
-if [[ -f .env ]]; then
-  export $(grep -v '^#' .env | xargs) # Export variables from .env, ignoring comments
-fi
-
-source ./common.sh
+source ./cmd/common.sh
 
 sudo apt -yqq install dialog > /dev/null 2>&1
 
 set -e
-
-# Funzione per gestire gli errori
-handle_error() {
-    echo "Errore: $1" >&2
-    exit 1
-}
-
-# Funzione per eseguire un comando docker compose e gestire gli errori
-run_docker_compose() {
-    docker compose run --remove-orphans --rm "$@" || handle_error "Errore durante l'esecuzione di docker compose: $?"
-    docker compose stop "$1" && docker compose rm -f "$1"
-}
-
-# Funzione per copiare un file e gestire gli errori
-copy_file() {
-    cp "$1" "$2" || handle_error "Errore durante la copia del file: $?"
-}
-
-# Funzione per impostare i permessi
-set_permissions() {
-    echo "Impostazione dei permessi..."
-    sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
-}
-
-# Funzione per generare la Root CA (corretta)
-generate_root_ca() {
-    local password email cn # Definisci le variabili localmente
-
-    # Usa read -r per leggere l'output delle funzioni di input
-    if ! read -r password <<< "$(get_password 'Password chiave privata ROOT CA')"; then
-        msg_warn "Operazione annullata dall'utente (password)."
-        return 1
-    fi
-    if [ -z "$password" ]; then # Controllo password vuota
-        msg_warn "Password non specificata, operazione annullata."
-        return 1
-    fi
-
-    if ! read -r email <<< "$(get_email 'Email ROOT CA')"; then
-        msg_warn "Operazione annullata dall'utente (email)."
-        return 1
-    fi
-    if [ -z "$email" ]; then # Controllo email vuota
-        msg_warn "Email non specificata, operazione annullata."
-        return 1
-    fi
-
-    if ! read -r cn <<< "$(get_cn 'CN ROOT CA')"; then
-        msg_warn "Operazione annullata dall'utente (CN)."
-        return 1
-    fi
-    if [ -z "$cn" ]; then # Controllo CN vuoto
-        msg_warn "CN non specificato, operazione annullata."
-        return 1
-    fi
-
-    msg_warn "Generazione della Root CA con CN: $cn, Email: $email..."
-
-    # Passa le variabili *correttamente* a docker compose run
-    docker compose run --remove-orphans --rm -e CN_ROOT="$cn" -e EMAIL_ROOT="$email" -e PASSWORD_ROOT="$password" root-ca /scripts/init-root-ca.sh
-
-    set_permissions
-    read -n 1 -s -r -p "Press any key to continue..."
-    echo
-}
 
 # Funzione per generare la CSR della Intermediate CA
 generate_intermediate_ca_csr() {
@@ -219,7 +149,7 @@ show_menu() {
                 ;;
             6)
                 set_permissions
-                ./clean.sh || handle_error "Errore durante la pulizia"
+                ./cmd/clean.sh || handle_error "Errore durante la pulizia"
                 mkdir -p "$SHARED_DATA_DIR" || handle_error "Errore durante la creazione della directory"
                 rm -rf $OUTPUT_DATA_DIR
                 mkdir -p $OUTPUT_DATA_DIR

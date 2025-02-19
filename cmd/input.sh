@@ -1,21 +1,4 @@
-# Variabili importanti
-CN_SERVER="${CN_SERVER:-server}"
-SHARED_DATA_DIR="${SHARED_DATA_DIR:-./shared-data}"
-OUTPUT_DATA_DIR="${OUTPUT_DATA_DIR:-./output}"
-
-NC=$'\033[0m' # No Color
-function msg_info() {
-  local GREEN=$'\033[0;32m'
-  printf "%s\n" "${GREEN}${*}${NC}" >&2
-}
-function msg_warn() {
-  local BROWN=$'\033[0;33m'
-  printf "%s\n" "${BROWN}${*}${NC}" >&2
-}
-function msg_error() {
-  local RED=$'\033[0;31m'
-  printf "%s\n" "${RED}${*}${NC}" >&2
-}
+#!/bin/bash
 
 # Funzione per ottenere la password dall'utente (corretta)
 get_password() {
