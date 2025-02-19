@@ -45,3 +45,10 @@ set_permissions() {
     echo "Impostazione dei permessi..."
     sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
+reset_env() {
+    set_permissions
+    $(dirname $0)/cmd/clean.sh || handle_error "Errore durante la pulizia"
+    mkdir -p "$SHARED_DATA_DIR" || handle_error "Errore durante la creazione della directory"
+    rm -rf $OUTPUT_DATA_DIR
+    mkdir -p $OUTPUT_DATA_DIR
+}
