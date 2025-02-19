@@ -5,24 +5,7 @@ if [[ -f .env ]]; then
   export $(grep -v '^#' .env | xargs) # Export variables from .env, ignoring comments
 fi
 
-# Variabili importanti
-CN_SERVER="${CN_SERVER:-server}"
-SHARED_DATA_DIR="${SHARED_DATA_DIR:-./shared-data}"
-OUTPUT_DATA_DIR="${OUTPUT_DATA_DIR:-./output}"
-
-NC=$'\033[0m' # No Color
-function msg_info() {
-  local GREEN=$'\033[0;32m'
-  printf "%s\n" "${GREEN}${*}${NC}" >&2
-}
-function msg_warn() {
-  local BROWN=$'\033[0;33m'
-  printf "%s\n" "${BROWN}${*}${NC}" >&2
-}
-function msg_error() {
-  local RED=$'\033[0;31m'
-  printf "%s\n" "${RED}${*}${NC}" >&2
-}
+source ./common.sh
 
 sudo apt -yqq install dialog > /dev/null 2>&1
 
@@ -51,10 +34,43 @@ set_permissions() {
     sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 
-# Funzione per generare la Root CA
+# Funzione per generare la Root CA (corretta)
 generate_root_ca() {
-    msg_warn "Generazione della Root CA..."
-    run_docker_compose root-ca /scripts/init-root-ca.sh
+    local password email cn # Definisci le variabili localmente
+
+    # Usa read -r per leggere l'output delle funzioni di input
+    if ! read -r password <<< "$(get_password 'Password chiave privata ROOT CA')"; then
+        msg_warn "Operazione annullata dall'utente (password)."
+        return 1
+    fi
+    if [ -z "$password" ]; then # Controllo password vuota
+        msg_warn "Password non specificata, operazione annullata."
+        return 1
+    fi
+
+    if ! read -r email <<< "$(get_email 'Email ROOT CA')"; then
+        msg_warn "Operazione annullata dall'utente (email)."
+        return 1
+    fi
+    if [ -z "$email" ]; then # Controllo email vuota
+        msg_warn "Email non specificata, operazione annullata."
+        return 1
+    fi
+
+    if ! read -r cn <<< "$(get_cn 'CN ROOT CA')"; then
+        msg_warn "Operazione annullata dall'utente (CN)."
+        return 1
+    fi
+    if [ -z "$cn" ]; then # Controllo CN vuoto
+        msg_warn "CN non specificato, operazione annullata."
+        return 1
+    fi
+
+    msg_warn "Generazione della Root CA con CN: $cn, Email: $email..."
+
+    # Passa le variabili *correttamente* a docker compose run
+    docker compose run --remove-orphans --rm -e CN_ROOT="$cn" -e EMAIL_ROOT="$email" -e PASSWORD_ROOT="$password" root-ca /scripts/init-root-ca.sh
+
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
     echo
@@ -62,8 +78,37 @@ generate_root_ca() {
 
 # Funzione per generare la CSR della Intermediate CA
 generate_intermediate_ca_csr() {
+    local password email cn # Definisci le variabili localmente
+
+    # Usa read -r per leggere l'output delle funzioni di input
+    if ! read -r password <<< "$(get_password 'Password chiave privata ITERMEDIATE CA')"; then
+        msg_warn "Operazione annullata dall'utente (password)."
+        return 1
+    fi
+    if [ -z "$password" ]; then # Controllo password vuota
+        msg_warn "Password non specificata, operazione annullata."
+        return 1
+    fi
+
+    if ! read -r email <<< "$(get_email 'Email ITERMEDIATE CA')"; then
+        msg_warn "Operazione annullata dall'utente (email)."
+        return 1
+    fi
+    if [ -z "$email" ]; then # Controllo email vuota
+        msg_warn "Email non specificata, operazione annullata."
+        return 1
+    fi
+
+    if ! read -r cn <<< "$(get_cn 'CN ITERMEDIATE CA')"; then
+        msg_warn "Operazione annullata dall'utente (CN)."
+        return 1
+    fi
+    if [ -z "$cn" ]; then # Controllo CN vuoto
+        msg_warn "CN non specificato, operazione annullata."
+        return 1
+    fi
     msg_warn "Generazione della CSR della Intermediate CA..."
-    run_docker_compose intermediate-ca /scripts/init-intermediate-ca.sh
+    docker compose run --remove-orphans --rm -e CN_INTERMEDIATE="$cn" -e EMAIL_INTERMEDIATE="$email" -e PASSWORD_INTERMEDIATE="$password" intermediate-ca /scripts/init-intermediate-ca.sh
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
     echo
@@ -71,66 +116,35 @@ generate_intermediate_ca_csr() {
 
 # Funzione per firmare la CSR della Intermediate CA con la Root CA
 sign_intermediate_ca_csr() {
+    local password
+
+    # Usa read -r per leggere l'output delle funzioni di input
+    if ! read -r password <<< "$(get_password 'Password chiave privata ROOT CA')"; then
+        msg_warn "Operazione annullata dall'utente (password)."
+        return 1
+    fi
+    if [ -z "$password" ]; then # Controllo password vuota
+        msg_warn "Password non specificata, operazione annullata."
+        return 1
+    fi
     msg_warn "Firma della CSR della Intermediate CA con la Root CA..."
     copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.csr.pem" "$SHARED_DATA_DIR/root-ca/csr/"
-    run_docker_compose root-ca /scripts/sign-intermediate-ca-csr.sh
+    docker compose run --remove-orphans --rm -e CN_ROOT="" -e EMAIL_ROOT="" -e PASSWORD_ROOT="$password" root-ca /scripts/sign-intermediate-ca-csr.sh
     copy_file "$SHARED_DATA_DIR/root-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/intermediate-ca/certs/"
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
     echo
 }
 
-# Funzione per ottenere EMAIL dall'utente
-get_server_email() {
-  local email_default="prova@dominio.it"  # Valore predefinito
-  local email
-
-  email=$(dialog --clear --title "Informazioni Server" \
-    --inputbox "Email:" 10 60 "$email_default" 2>&1 >/dev/tty)
-  if [[ $? -ne 0 ]]; then # Controllo annullamento
-    return 1 # Fallimento
-  fi
-
-  echo "$email"
-}
-
-# Funzione per ottenere CN dall'utente
-get_server_cn() {
-  local cn_default="www.manzolo.it"  # Valore predefinito
-  local cn
-
-  cn=$(dialog --clear --title "Informazioni Server" \
-    --inputbox "CN (Common Name):" 10 60 "$cn_default" 2>&1 >/dev/tty)
-
-  if [[ $? -ne 0 ]]; then  # Controllo annullamento
-    return 1 # Fallimento
-  fi
-
-  echo "$cn"
-}
-
-# Funzione per ottenere la password dall'utente
-get_password() {
-  local pwd
-
-  pwd=$(dialog --clear --title "Informazioni CA" \
-    --inputbox "Password chiave privata CA:" 10 60 "" 2>&1 >/dev/tty)
-  if [[ $? -ne 0 ]]; then # Controllo annullamento
-    return 1 # Fallimento
-  fi
-
-  echo "$pwd"
-}
-
 # Funzione per generare la CSR del server (modificata)
 generate_server_csr() {
     local cn
-    if ! read cn <<< "$(get_server_cn)"; then
+    if ! read cn <<< "$(get_cn 'Server CN')"; then
         msg_warn "Operazione annullata dall'utente."
         return 1 
     fi
     local email
-    if ! read email <<< "$(get_server_email)"; then  
+    if ! read email <<< "$(get_email 'Server Email')"; then  
         msg_warn "Operazione annullata dall'utente."
         return 1 
     fi
@@ -148,13 +162,24 @@ generate_server_csr() {
 
 # Funzione per firmare la CSR del server con la Intermediate CA
 sign_server_csr() {
-    if ! read cn <<< "$(get_server_cn)"; then
+    local password cn
+    if ! read cn <<< "$(get_cn 'CN da firmare')"; then
         msg_warn "Operazione annullata dall'utente."
         return 1 
-    fi      
+    fi
+
+    # Usa read -r per leggere l'output delle funzioni di input
+    if ! read -r password <<< "$(get_password 'Password chiave privata INTERMEDIATE CA')"; then
+        msg_warn "Operazione annullata dall'utente (password)."
+        return 1
+    fi
+    if [ -z "$password" ]; then # Controllo password vuota
+        msg_warn "Password non specificata, operazione annullata."
+        return 1
+    fi
     msg_warn "Firma della CSR del server con la Intermediate CA..."
     copy_file "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem" "$SHARED_DATA_DIR/intermediate-ca/csr/"
-    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" intermediate-ca /scripts/sign-server-ca-csr.sh
+    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_INTERMEDIATE="$password" intermediate-ca /scripts/sign-server-ca-csr.sh
     copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/${cn}.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
