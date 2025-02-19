@@ -1,15 +1,13 @@
 [ ca ]
-default_ca = CA_SERVER
+default_ca = SERVER_CA
 
-[ CA_SERVER ]
-dir             = /manzoloCA/intermediate
+[ SERVER_CA ]
+dir             = /manzoloCA
 certs           = $dir/certs
 crl_dir         = $dir/crl
 new_certs_dir   = $dir/newcerts
 database        = $dir/index.txt
 serial          = $dir/serial
-private_key     = $dir/private/CA_INTERMEDIATE.key.pem
-certificate     = $dir/certs/CA_INTERMEDIATE.cert.pem
 default_days    = 365  # 1 anno
 default_md      = sha256
 policy          = policy_anything
@@ -30,19 +28,18 @@ default_md             = sha256
 distinguished_name     = dn
 
 [ dn ]
-C                      = IT
-ST                     = Toscana
-L                      = Scarperia e San Piero
-O                      = Manzolo Home
-OU                     = Manzolo TLS Cert
-CN                     = $ENV::CN
-emailAddress           = $ENV::EMAIL
-
+C                      = $ENV::C_SERVER
+ST                     = $ENV::ST_SERVER
+L                      = $ENV::L_SERVER
+O                      = $ENV::O_SERVER
+OU                     = $ENV::OU_SERVER
+CN                     = $ENV::CN_SERVER
+emailAddress           = $ENV::EMAIL_SERVER
 [ v3_server ]
 basicConstraints = CA:FALSE
 keyUsage = digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
+extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = $ENV::CN
+DNS.1 = $ENV::CN_SERVER

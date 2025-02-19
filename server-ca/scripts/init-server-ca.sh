@@ -1,31 +1,25 @@
 #!/bin/sh
 
-if [ -f "/manzoloCA/server/private/${CN}.key.pem" ]; then
-    echo "Il file ${CN}.key.pem esiste. Non eseguo la generazione"
-else
-    # Installa OpenSSL
-    apk add --no-cache openssl
+# Installa OpenSSL
+apk add --no-cache openssl
 
-    # Crea la struttura delle directory
-    mkdir -p /manzoloCA/server/certs
-    mkdir -p /manzoloCA/server/private
-    mkdir -p /manzoloCA/server/csr
+if [ -f "/manzoloCA/private/${CN_SERVER}.key.pem" ]; then
+    echo "Il file ${CNCN_SERVER}.key.pem esiste. Non eseguo la generazione"
+else
+    # Crea la directory per il server
+    mkdir -p /manzoloCA/certs /manzoloCA/private /manzoloCA/csr
+    chmod 700 /manzoloCA/private
+
+    # Genera la chiave privata del server
+    openssl genpkey -algorithm RSA -out /manzoloCA/private/${CN_SERVER}.key.pem -aes256 -pass pass:manzoloxpwd
+    chmod 400 /manzoloCA/private/${CN_SERVER}.key.pem
 
     # Genera la CSR per il server
-    openssl req -config /etc/ssl/openssl.cnf -new \
-        -keyout /manzoloCA/server/private/${CN}.key.pem \
-        -out /manzoloCA/server/csr/${CN}.csr.pem \
-        -subj "/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo TLS Cert/CN=${CN}" \
-        -passout pass:manzoloX
+    openssl req \
+        -key /manzoloCA/private/${CN_SERVER}.key.pem \
+        -new -sha256 -out /manzoloCA/csr/${CN_SERVER}.csr.pem \
+        -subj "/C=${C_SERVER}/ST=${ST_SERVER}/L=${L_SERVER}/O=${O_SERVER}/OU=${OU_SERVER}/CN=${CN_SERVER}/emailAddress=${EMAIL_SERVER}" \
+        -passin pass:manzoloxpwd
 
-    # Firma la CSR con la CA intermedia
-    openssl ca -config /manzoloCA/intermediate/openssl.cnf \
-        -extensions v3_server -days 365 -notext -md sha256 \
-        -in /manzoloCA/server/csr/${CN}.csr.pem \
-        -out /manzoloCA/server/certs/${CN}.cert.pem \
-        -passin pass:manzolo1 \
-        -batch  # Conferme automatiche
-    
-    echo "Certificato server generato con successo!"
+    echo "Server CSR generata con successo!"
 fi
-

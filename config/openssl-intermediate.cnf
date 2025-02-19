@@ -1,15 +1,15 @@
 [ ca ]
-default_ca = CA_INTERMEDIATE
+default_ca = INTERMEDIATE_CA
 
-[ CA_INTERMEDIATE ]
-dir             = /manzoloCA/intermediate
+[ INTERMEDIATE_CA ]
+dir             = /manzoloCA
 certs           = $dir/certs
 crl_dir         = $dir/crl
 new_certs_dir   = $dir/newcerts
 database        = $dir/index.txt
 serial          = $dir/serial
-private_key     = $dir/private/CA_INTERMEDIATE.key.pem
-certificate     = $dir/certs/CA_INTERMEDIATE.cert.pem
+private_key     = $dir/private/intermediate-ca.key.pem
+certificate     = $dir/certs/intermediate-ca.crt.pem
 default_days    = 1825  # 5 anni
 default_md      = sha256
 policy          = policy_anything
@@ -30,13 +30,13 @@ default_md             = sha256
 distinguished_name     = dn
 
 [ dn ]
-C                      = $ENV::C_INTERMEDIATE1
-ST                     = $ENV::ST_INTERMEDIATE1
-L                      = $ENV::L_INTERMEDIATE1
-O                      = $ENV::O_INTERMEDIATE1
-OU                     = $ENV::OU_INTERMEDIATE1
-CN                     = $ENV::CN_INTERMEDIATE1
-emailAddress           = $ENV::EMAIL_INTERMEDIATE1
+C                      = $ENV::C_INTERMEDIATE
+ST                     = $ENV::ST_INTERMEDIATE
+L                      = $ENV::L_INTERMEDIATE
+O                      = $ENV::O_INTERMEDIATE
+OU                     = $ENV::OU_INTERMEDIATE
+CN                     = $ENV::CN_INTERMEDIATE
+emailAddress           = $ENV::EMAIL_INTERMEDIATE
 
 [ v3_intermediate_ca ]
 basicConstraints = CA:TRUE, pathlen:0
@@ -45,8 +45,8 @@ keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 [ v3_server ]
 basicConstraints = CA:FALSE
 keyUsage = digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
+extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = $ENV::CN
+DNS.1 = $ENV::CN_SERVER

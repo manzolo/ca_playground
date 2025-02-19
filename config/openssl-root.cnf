@@ -1,15 +1,15 @@
 [ ca ]
-default_ca = CA_ROOT
+default_ca = ROOT_CA
 
-[ CA_ROOT ]
+[ ROOT_CA ]
 dir             = /manzoloCA
 certs           = $dir/certs
 crl_dir         = $dir/crl
 new_certs_dir   = $dir/newcerts
 database        = $dir/index.txt
 serial          = $dir/serial
-private_key     = $dir/private/CA_ROOT.key.pem
-certificate     = $dir/certs/CA_ROOT.cert.pem
+private_key     = $dir/private/root-ca.key.pem
+certificate     = $dir/certs/root-ca.crt.pem
 default_days    = 3650  # 10 anni
 default_md      = sha256
 policy          = policy_anything
@@ -30,13 +30,14 @@ default_md             = sha256
 distinguished_name     = dn
 
 [ dn ]
-C                      = IT
-ST                     = Toscana
-L                      = Scarperia e San Piero
-O                      = Manzolo Home
-OU                     = Manzolo Root CA
-CN                     = Manzolo Root Certification Authority
-emailAddress           = root@manzolo.org
+C                      = $ENV::C_ROOT
+ST                     = $ENV::ST_ROOT
+L                      = $ENV::L_ROOT
+O                      = $ENV::O_ROOT
+OU                     = $ENV::OU_ROOT
+CN                     = $ENV::CN_ROOT
+emailAddress           = $ENV::EMAIL_ROOT
+
 
 [ v3_ca ]
 basicConstraints = CA:TRUE

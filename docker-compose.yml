@@ -6,7 +6,15 @@ services:
       - ./config/openssl-root.cnf:/etc/ssl/openssl.cnf
       - ./root-ca/scripts:/scripts
       - ./shared-data/root-ca:/manzoloCA
-    entrypoint: ["/scripts/init-root-ca.sh"]
+    environment:
+      - C_ROOT=${C_ROOT}
+      - ST_ROOT=${ST_ROOT}
+      - L_ROOT=${L_ROOT}
+      - O_ROOT=${O_ROOT}
+      - OU_ROOT=${OU_ROOT}
+      - CN_ROOT=${CN_ROOT}
+      - EMAIL_ROOT=${EMAIL_ROOT}
+    #entrypoint: ["/scripts/init-root-ca.sh"]
 
   intermediate-ca:
     image: alpine:latest
@@ -14,36 +22,33 @@ services:
     volumes:
       - ./config/openssl-intermediate.cnf:/etc/ssl/openssl.cnf
       - ./intermediate-ca/scripts:/scripts
-      - ./shared-data/root-ca:/manzoloCA
-      - ./shared-data/intermediate-ca:/manzoloCA/intermediate
+      - ./shared-data/intermediate-ca:/manzoloCA
     environment:
-      - CN=${CN}
-      - EMAIL=${EMAIL}
-      - C_INTERMEDIATE1=${C_INTERMEDIATE1}
-      - ST_INTERMEDIATE1=${ST_INTERMEDIATE1}
-      - L_INTERMEDIATE1=${L_INTERMEDIATE1}
-      - O_INTERMEDIATE1=${O_INTERMEDIATE1}
-      - OU_INTERMEDIATE1=${OU_INTERMEDIATE1}
-      - CN_INTERMEDIATE1=${CN_INTERMEDIATE1}
-      - EMAIL_INTERMEDIATE1=${EMAIL_INTERMEDIATE1}
-    entrypoint: ["/scripts/init-intermediate-ca.sh"]
+      - CN_INTERMEDIATE=${CN_INTERMEDIATE}
+      - EMAIL_INTERMEDIATE=${EMAIL_INTERMEDIATE}
+      - C_INTERMEDIATE=${C_INTERMEDIATE}
+      - ST_INTERMEDIATE=${ST_INTERMEDIATE}
+      - L_INTERMEDIATE=${L_INTERMEDIATE}
+      - O_INTERMEDIATE=${O_INTERMEDIATE}
+      - OU_INTERMEDIATE=${OU_INTERMEDIATE}
+      - CN_INTERMEDIATE=${CN_INTERMEDIATE}
+      - EMAIL_INTERMEDIATE=${EMAIL_INTERMEDIATE}
+      - CN_SERVER=${CN_SERVER}
+    #entrypoint: ["/scripts/init-intermediate-ca.sh"]
 
   server-ca:
     image: alpine:latest
     container_name: server-ca
     environment:
-      - CN=${CN}
-      - EMAIL=${EMAIL}
-      - C_INTERMEDIATE1=${C_INTERMEDIATE1}
-      - ST_INTERMEDIATE1=${ST_INTERMEDIATE1}
-      - L_INTERMEDIATE1=${L_INTERMEDIATE1}
-      - O_INTERMEDIATE1=${O_INTERMEDIATE1}
-      - OU_INTERMEDIATE1=${OU_INTERMEDIATE1}
-      - CN_INTERMEDIATE1=${CN_INTERMEDIATE1}
-      - EMAIL_INTERMEDIATE1=${EMAIL_INTERMEDIATE1}      
+      - C_SERVER=${C_SERVER}
+      - ST_SERVER=${ST_SERVER}
+      - L_SERVER=${L_SERVER}
+      - O_SERVER=${O_SERVER}
+      - OU_SERVER=${OU_SERVER}
+      - CN_SERVER=${CN_SERVER}
+      - EMAIL_SERVER=${EMAIL_SERVER}
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./server-ca/scripts:/scripts
-      - ./shared-data/intermediate-ca:/manzoloCA/intermediate
-      - ./shared-data/server-ca:/manzoloCA/server
-    entrypoint: ["/scripts/init-server-ca.sh"]
+      - ./shared-data/server-ca:/manzoloCA
+    #entrypoint: ["/scripts/init-server-ca.sh"]
