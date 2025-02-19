@@ -1,10 +1,26 @@
 #!/bin/sh
 
+set -e
+
+NC=$'\033[0m' # No Color
+function msg_info() {
+  local GREEN=$'\033[0;32m'
+  printf "%s\n" "${GREEN}${*}${NC}" >&2
+}
+function msg_warn() {
+  local BROWN=$'\033[0;33m'
+  printf "%s\n" "${BROWN}${*}${NC}" >&2
+}
+function msg_error() {
+  local RED=$'\033[0;31m'
+  printf "%s\n" "${RED}${*}${NC}" >&2
+}
+
 # Installa OpenSSL
 apk add --no-cache openssl
 
 if [ -f "/manzoloCA/private/root-ca.key.pem" ]; then
-    echo "Il file root-ca.key.pem esiste. Non eseguo la generazione"
+    msg_warn "Il file root-ca.key.pem esiste. Non eseguo la generazione"
 else
     # Crea la directory per la Root CA
     mkdir -p /manzoloCA/certs /manzoloCA/crl /manzoloCA/newcerts /manzoloCA/private /manzoloCA/csr
@@ -24,5 +40,5 @@ else
         -subj "/C=${C_ROOT}/ST=${ST_ROOT}/L=${L_ROOT}/O=${O_ROOT}/OU=${OU_ROOT}/CN=${CN_ROOT}/emailAddress=${EMAIL_ROOT}" \
         -passin pass:manzolopwd
 
-    echo "Root CA creata con successo!"
+    msg_warn "Root CA creata con successo!"
 fi

@@ -1,10 +1,26 @@
 #!/bin/sh
 
+set -e
+
+NC=$'\033[0m' # No Color
+function msg_info() {
+  local GREEN=$'\033[0;32m'
+  printf "%s\n" "${GREEN}${*}${NC}" >&2
+}
+function msg_warn() {
+  local BROWN=$'\033[0;33m'
+  printf "%s\n" "${BROWN}${*}${NC}" >&2
+}
+function msg_error() {
+  local RED=$'\033[0;31m'
+  printf "%s\n" "${RED}${*}${NC}" >&2
+}
+
 # Installa OpenSSL
 apk add --no-cache openssl
 
 if [ -f "/manzoloCA/private/intermediate-ca.key.pem" ]; then
-    echo "Il file CA_INTERMEDIATE.key.pem esiste. Non eseguo la generazione"
+    msg_warn "Il file CA_INTERMEDIATE.key.pem esiste. Non eseguo la generazione"
 else
     # Crea la directory per la Intermediate CA
     mkdir -p /manzoloCA/certs /manzoloCA/crl /manzoloCA/newcerts /manzoloCA/private /manzoloCA/csr
@@ -23,7 +39,7 @@ else
         -subj "/C=${C_INTERMEDIATE}/ST=${ST_INTERMEDIATE}/L=${L_INTERMEDIATE}/O=${O_INTERMEDIATE}/OU=${OU_INTERMEDIATE}/CN=${CN_INTERMEDIATE}/emailAddress=${EMAIL_INTERMEDIATE}" \
         -passin pass:manzolo1pwd
 
-    echo "Intermediate CA CSR generata con successo!"
+    msg_warn "Intermediate CA CSR generata con successo!"
 
     
 fi

@@ -1,14 +1,32 @@
 #!/bin/bash
 
-# Carica il file .env se esiste
-if [ -f .env ]; then
-    source .env
+# Load .env file if it exists
+if [[ -f .env ]]; then
+  export $(grep -v '^#' .env | xargs) # Export variables from .env, ignoring comments
 fi
 
 # Variabili importanti
 CN_SERVER="${CN_SERVER:-server}"
 SHARED_DATA_DIR="${SHARED_DATA_DIR:-./shared-data}"
 OUTPUT_DATA_DIR="${OUTPUT_DATA_DIR:-./output}"
+
+NC=$'\033[0m' # No Color
+function msg_info() {
+  local GREEN=$'\033[0;32m'
+  printf "%s\n" "${GREEN}${*}${NC}" >&2
+}
+function msg_warn() {
+  local BROWN=$'\033[0;33m'
+  printf "%s\n" "${BROWN}${*}${NC}" >&2
+}
+function msg_error() {
+  local RED=$'\033[0;31m'
+  printf "%s\n" "${RED}${*}${NC}" >&2
+}
+
+sudo apt -yqq install dialog > /dev/null 2>&1
+
+set -e
 
 # Funzione per gestire gli errori
 handle_error() {
@@ -33,56 +51,149 @@ set_permissions() {
     sudo chown -R manzolo:manzolo "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 
-# Pulisci l'ambiente
-sudo ./clean.sh || handle_error "Errore durante la pulizia"
-mkdir -p "$SHARED_DATA_DIR" || handle_error "Errore durante la creazione della directory"
-rm -rf $OUTPUT_DATA_DIR
-mkdir -p $OUTPUT_DATA_DIR
+# Funzione per generare la Root CA
+generate_root_ca() {
+    msg_warn "Generazione della Root CA..."
+    run_docker_compose root-ca /scripts/init-root-ca.sh
+    set_permissions
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+}
 
-# Crea la CA radice
-run_docker_compose root-ca /scripts/init-root-ca.sh
+# Funzione per generare la CSR della Intermediate CA
+generate_intermediate_ca_csr() {
+    msg_warn "Generazione della CSR della Intermediate CA..."
+    run_docker_compose intermediate-ca /scripts/init-intermediate-ca.sh
+    set_permissions
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+}
 
-# Crea la CA intermedia
-run_docker_compose intermediate-ca /scripts/init-intermediate-ca.sh
+# Funzione per firmare la CSR della Intermediate CA con la Root CA
+sign_intermediate_ca_csr() {
+    msg_warn "Firma della CSR della Intermediate CA con la Root CA..."
+    copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.csr.pem" "$SHARED_DATA_DIR/root-ca/csr/"
+    run_docker_compose root-ca /scripts/sign-intermediate-ca-csr.sh
+    copy_file "$SHARED_DATA_DIR/root-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/intermediate-ca/certs/"
+    set_permissions
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+}
 
-# Imposta i permessi
-set_permissions
+# Funzione per ottenere CN e EMAIL dall'utente
+get_server_email() {
+  local email
 
-# Firma la CSR della CA intermedia con la CA radice
-echo "Firma della CSR della CA intermedia con la CA radice..."
-copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.csr.pem" "$SHARED_DATA_DIR/root-ca/csr/"
-run_docker_compose root-ca /scripts/sign-intermediate-ca-csr.sh
+  email=$(dialog --clear --title "Informazioni Server" \
+    --inputbox "Email:" 10 60 "" 2>&1 >/dev/tty)
+  if [[ $? -ne 0 ]]; then # Controllo annullamento
+    return 1 # Fallimento
+  fi
 
-# Copia il certificato della CA intermedia
-echo "Copia del certificato della CA intermedia..."
-copy_file "$SHARED_DATA_DIR/root-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/intermediate-ca/certs/"
+  echo "$email" # Restituisce CN e EMAIL
+}
 
-# Crea la CSR del server
-echo "Creazione della CSR del server..."
-run_docker_compose server-ca /scripts/init-server-ca.sh
+# Funzione per ottenere CN e EMAIL dall'utente
+get_server_cn() {
+  local cn
 
-# Firma la CSR del server con la CA intermedia
-echo "Firma della CSR del server con la CA intermedia..."
-copy_file "$SHARED_DATA_DIR/server-ca/csr/${CN_SERVER}.csr.pem" "$SHARED_DATA_DIR/intermediate-ca/csr/"
-run_docker_compose intermediate-ca /scripts/sign-server-ca-csr.sh
+  cn=$(dialog --clear --title "Informazioni Server" \
+    --inputbox "CN (Common Name):" 10 60 "" 2>&1 >/dev/tty)
+  if [[ $? -ne 0 ]]; then  # Controllo annullamento
+    return 1 # Fallimento
+  fi
 
-# Copia il certificato del server
-echo "Copia del certificato del server..."
-copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/${CN_SERVER}.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
+  echo "$cn" # Restituisce CN e EMAIL
+}
 
-# Copia i certificati nel folder output
-copy_file "$SHARED_DATA_DIR/root-ca/certs/root-ca.crt.pem" "$OUTPUT_DATA_DIR"
-copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.crt.pem" "$OUTPUT_DATA_DIR"
-copy_file "$SHARED_DATA_DIR/server-ca/certs/${CN_SERVER}.crt.pem" "$OUTPUT_DATA_DIR"
 
-# Creazione della fullchain.pem
-cat "$OUTPUT_DATA_DIR/${CN_SERVER}.crt.pem" "$OUTPUT_DATA_DIR/intermediate-ca.crt.pem" "$OUTPUT_DATA_DIR/root-ca.crt.pem" > "$OUTPUT_DATA_DIR/fullchain.pem" || handle_error "Errore durante la creazione di fullchain.pem"
+# Funzione per generare la CSR del server (modificata)
+generate_server_csr() {
+    local cn
+    if ! read cn <<< "$(get_server_cn)"; then
+        msg_warn "Operazione annullata dall'utente."
+        return 1 
+    fi
+    local email
+    if ! read email <<< "$(get_server_email)"; then  
+        msg_warn "Operazione annullata dall'utente."
+        return 1 
+    fi
 
-# Creazione del file contenente solo le CA (root e intermediate)
-cat "$OUTPUT_DATA_DIR/root-ca.crt.pem" "$OUTPUT_DATA_DIR/intermediate-ca.crt.pem" > "$OUTPUT_DATA_DIR/ca.pem" || handle_error "Errore durante la creazione di ca.pem"
+    msg_warn "Generazione della CSR del server per CN: $cn, Email: $email..."
 
-# Imposta i permessi
-set_permissions
+    # Passa CN ed EMAIL al container usando variabili d'ambiente
+    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e EMAIL_SERVER="$email" server-ca /scripts/init-server-ca.sh
+    docker compose stop server-ca && docker compose rm -f server-ca
 
-echo "Processo completato con successo!"
-exit 0
+    set_permissions
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+}
+
+# Funzione per firmare la CSR del server con la Intermediate CA
+sign_server_csr() {
+    if ! read cn <<< "$(get_server_cn)"; then
+        msg_warn "Operazione annullata dall'utente."
+        return 1 
+    fi      
+    msg_warn "Firma della CSR del server con la Intermediate CA..."
+    copy_file "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem" "$SHARED_DATA_DIR/intermediate-ca/csr/"
+    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" intermediate-ca /scripts/sign-server-ca-csr.sh
+    copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/${cn}.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
+    set_permissions
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo
+}
+
+# Menu grafico
+show_menu() {
+    while true; do
+        choice=$(dialog --clear --backtitle "Menu di gestione CA" \
+            --title "Seleziona un'opzione" \
+            --menu "Cosa vuoi fare?" 20 60 8 \
+            1 "Genera Root CA" \
+            2 "Genera CSR Intermediate CA" \
+            3 "Firma CSR Intermediate CA" \
+            4 "Genera CSR Server" \
+            5 "Firma CSR Server" \
+            6 "Reset" \
+            7 "Esci" \
+            2>&1 >/dev/tty)
+
+        case $choice in
+            1)
+                generate_root_ca
+                ;;
+            2)
+                generate_intermediate_ca_csr
+                ;;
+            3)
+                sign_intermediate_ca_csr
+                ;;
+            4)
+                generate_server_csr
+                ;;
+            5)
+                sign_server_csr
+                ;;
+            6)
+                set_permissions
+                ./clean.sh || handle_error "Errore durante la pulizia"
+                mkdir -p "$SHARED_DATA_DIR" || handle_error "Errore durante la creazione della directory"
+                rm -rf $OUTPUT_DATA_DIR
+                mkdir -p $OUTPUT_DATA_DIR
+                ;;
+            7)
+                echo "Uscita..."
+                exit 0
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+}
+
+# Mostra il menu
+show_menu

@@ -15,7 +15,7 @@ for dir in "${DIRECTORIES[@]}"; do
   if [ -d "$dir" ]; then
     echo "Pulizia della directory: $dir"
     for ext in "${EXTENSIONS[@]}"; do
-      find "$dir" -type f -name "*.$ext" -exec rm -v {} \;
+      find "$dir" -type f -name "*.$ext" -exec rm -f {} \;
     done
   else
     echo "Directory $dir non trovata, saltando..."
@@ -29,7 +29,7 @@ for dir in "${DIRECTORIES[@]}"; do
   if [ -d "$dir" ]; then
     echo "Pulizia della directory: $dir"
     for file in "${FILES[@]}"; do
-      find "$dir" -type f -name "$file" -exec rm -v {} \;
+      find "$dir" -type f -name "$file" -exec rm -f {} \;
     done
   else
     echo "Directory $dir non trovata, saltando..."

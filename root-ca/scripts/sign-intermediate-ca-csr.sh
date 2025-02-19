@@ -1,10 +1,26 @@
 #!/bin/sh
 
+set -e
+
+NC=$'\033[0m' # No Color
+function msg_info() {
+  local GREEN=$'\033[0;32m'
+  printf "%s\n" "${GREEN}${*}${NC}" >&2
+}
+function msg_warn() {
+  local BROWN=$'\033[0;33m'
+  printf "%s\n" "${BROWN}${*}${NC}" >&2
+}
+function msg_error() {
+  local RED=$'\033[0;31m'
+  printf "%s\n" "${RED}${*}${NC}" >&2
+}
+
 # Installa OpenSSL
 apk add --no-cache openssl
 
 if [ -f "/manzoloCA/certs/intermediate-ca.crt.pem" ]; then
-    echo "Il file intermediate-ca.crt.pem esiste. Non eseguo la generazione"
+    msg_warn "Il file intermediate-ca.crt.pem esiste. Non eseguo la generazione"
 else
     # Crea la directory per la Root CA
     openssl ca -config /etc/ssl/openssl.cnf \
@@ -15,5 +31,5 @@ else
       -passin pass:manzolopwd \
       -batch
 
-    echo "Intermediate CA firmata con successo!"
+    msg_warn "Intermediate CA firmata con successo!"
 fi
