@@ -20,7 +20,7 @@ function msg_error() {
 apk add --no-cache openssl
 
 if [ -f "/manzoloCA/private/${CN_SERVER}.key.pem" ]; then
-    msg_warn "Il file ${CNCN_SERVER}.key.pem esiste. Non eseguo la generazione"
+    msg_warn "Il file ${CN_SERVER}.key.pem esiste. Non eseguo la generazione"
 else
     # Crea la directory per il server
     mkdir -p /manzoloCA/certs /manzoloCA/private /manzoloCA/csr
