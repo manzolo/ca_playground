@@ -5,10 +5,14 @@ source $(dirname $0)/cmd/root.sh
 source $(dirname $0)/cmd/intermediate.sh
 source $(dirname $0)/cmd/server.sh
 
-# Load .env file if it exists
-if [[ -f .env ]]; then
-  export $(grep -v '^#' .env | xargs) # Export variables from .env, ignoring comments
-fi
+while IFS= read -r line; do
+  # Verifica se la riga è un commento o è vuota (ignorando spazi iniziali e finali)
+  if [[ ! "$line" =~ ^# ]] && [[ ! "$line" =~ ^[[:space:]]*$ ]]; then
+    export "$line"
+  fi
+done < .env
+
+#read -n 1 -s -r -p "Press any key to continue..."
 
 # Variabili importanti
 CN_SERVER="${CN_SERVER:-server}"

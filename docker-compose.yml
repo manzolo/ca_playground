@@ -21,14 +21,11 @@ services:
       - ./intermediate-ca/scripts:/scripts
       - ./shared-data/intermediate-ca:/manzoloCA
     environment:
-      - CN_INTERMEDIATE=${CN_INTERMEDIATE}
-      - EMAIL_INTERMEDIATE=${EMAIL_INTERMEDIATE}
       - C_INTERMEDIATE=${C_INTERMEDIATE}
       - ST_INTERMEDIATE=${ST_INTERMEDIATE}
       - L_INTERMEDIATE=${L_INTERMEDIATE}
       - O_INTERMEDIATE=${O_INTERMEDIATE}
       - OU_INTERMEDIATE=${OU_INTERMEDIATE}
-      - CN_SERVER=${CN_SERVER}
 
   server-ca:
     image: alpine:latest

@@ -30,7 +30,7 @@ generate_intermediate_ca_csr() {
         return 1
     fi
     msg_warn "Generazione della CSR della Intermediate CA..."
-    docker compose run --remove-orphans --rm -e CN_INTERMEDIATE="$cn" -e EMAIL_INTERMEDIATE="$email" -e PASSWORD_INTERMEDIATE="$password" intermediate-ca /scripts/init-intermediate-ca.sh
+    docker compose run --remove-orphans --rm -e CN_INTERMEDIATE="$cn" -e EMAIL_INTERMEDIATE="$email" -e PASSWORD_INTERMEDIATE="$password" -e CN_SERVER="" intermediate-ca /scripts/init-intermediate-ca.sh
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
     echo
@@ -55,7 +55,7 @@ sign_server_csr() {
     fi
     msg_warn "Firma della CSR del server con la Intermediate CA..."
     copy_file "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem" "$SHARED_DATA_DIR/intermediate-ca/csr/"
-    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_INTERMEDIATE="$password" intermediate-ca /scripts/sign-server-ca-csr.sh
+    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_INTERMEDIATE="$password" -e EMAIL_INTERMEDIATE="" -e CN_INTERMEDIATE="" intermediate-ca /scripts/sign-server-ca-csr.sh
     copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/${cn}.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
