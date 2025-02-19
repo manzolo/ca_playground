@@ -27,7 +27,7 @@ else
     chmod 700 /manzoloCA/private
 
     # Genera la chiave privata del server
-    openssl genpkey -algorithm RSA -out /manzoloCA/private/${CN_SERVER}.key.pem -aes256 -pass pass:manzoloxpwd
+    openssl genpkey -algorithm RSA -out /manzoloCA/private/${CN_SERVER}.key.pem -aes256 -pass pass:${PASSWORD_SERVER}
     chmod 400 /manzoloCA/private/${CN_SERVER}.key.pem
 
     # Genera la CSR per il server
@@ -35,7 +35,7 @@ else
         -key /manzoloCA/private/${CN_SERVER}.key.pem \
         -new -sha256 -out /manzoloCA/csr/${CN_SERVER}.csr.pem \
         -subj "/C=${C_SERVER}/ST=${ST_SERVER}/L=${L_SERVER}/O=${O_SERVER}/OU=${OU_SERVER}/CN=${CN_SERVER}/emailAddress=${EMAIL_SERVER}" \
-        -passin pass:manzoloxpwd
+        -passin pass:${PASSWORD_SERVER}
 
     echo "Server CSR generata con successo!"
 fi

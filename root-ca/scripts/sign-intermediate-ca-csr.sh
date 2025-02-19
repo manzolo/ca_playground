@@ -28,7 +28,7 @@ else
       -days 3650 -notext -md sha256 \
       -in /manzoloCA/csr/intermediate-ca.csr.pem \
       -out /manzoloCA/certs/intermediate-ca.crt.pem \
-      -passin pass:manzolopwd \
+      -passin pass:${PASSWORD_ROOT} \
       -batch
 
     msg_warn "Intermediate CA firmata con successo!"

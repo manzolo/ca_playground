@@ -90,20 +90,22 @@ get_server_email() {
     return 1 # Fallimento
   fi
 
-  echo "$email" # Restituisce CN e EMAIL
+  echo "$email"
 }
 
 # Funzione per ottenere CN e EMAIL dall'utente
 get_server_cn() {
+  local cn_default="www.manzolo.it"  # Valore predefinito
   local cn
 
   cn=$(dialog --clear --title "Informazioni Server" \
-    --inputbox "CN (Common Name):" 10 60 "" 2>&1 >/dev/tty)
+    --inputbox "CN (Common Name):" 10 60 "$cn_default" 2>&1 >/dev/tty)
+
   if [[ $? -ne 0 ]]; then  # Controllo annullamento
     return 1 # Fallimento
   fi
 
-  echo "$cn" # Restituisce CN e EMAIL
+  echo "$cn"
 }
 
 

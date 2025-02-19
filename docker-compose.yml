@@ -14,6 +14,8 @@ services:
       - OU_ROOT=${OU_ROOT}
       - CN_ROOT=${CN_ROOT}
       - EMAIL_ROOT=${EMAIL_ROOT}
+      - PASSWORD_ROOT=${PASSWORD_ROOT}
+
     #entrypoint: ["/scripts/init-root-ca.sh"]
 
   intermediate-ca:
@@ -34,6 +36,7 @@ services:
       - CN_INTERMEDIATE=${CN_INTERMEDIATE}
       - EMAIL_INTERMEDIATE=${EMAIL_INTERMEDIATE}
       - CN_SERVER=${CN_SERVER}
+      - PASSWORD_INTERMEDIATE=${PASSWORD_INTERMEDIATE}
     #entrypoint: ["/scripts/init-intermediate-ca.sh"]
 
   server-ca:
@@ -47,6 +50,8 @@ services:
       - OU_SERVER=${OU_SERVER}
       - CN_SERVER=${CN_SERVER}
       - EMAIL_SERVER=${EMAIL_SERVER}
+      - PASSWORD_SERVER=${PASSWORD_SERVER}
+
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./server-ca/scripts:/scripts
