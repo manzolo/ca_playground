@@ -48,7 +48,7 @@ copy_file() {
 # Funzione per impostare i permessi
 set_permissions() {
     echo "Impostazione dei permessi..."
-    sudo chown -R manzolo:manzolo "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
+    sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 
 # Funzione per generare la Root CA
@@ -80,12 +80,13 @@ sign_intermediate_ca_csr() {
     echo
 }
 
-# Funzione per ottenere CN e EMAIL dall'utente
+# Funzione per ottenere EMAIL dall'utente
 get_server_email() {
+  local email_default="prova@dominio.it"  # Valore predefinito
   local email
 
   email=$(dialog --clear --title "Informazioni Server" \
-    --inputbox "Email:" 10 60 "" 2>&1 >/dev/tty)
+    --inputbox "Email:" 10 60 "$email_default" 2>&1 >/dev/tty)
   if [[ $? -ne 0 ]]; then # Controllo annullamento
     return 1 # Fallimento
   fi
@@ -93,7 +94,7 @@ get_server_email() {
   echo "$email"
 }
 
-# Funzione per ottenere CN e EMAIL dall'utente
+# Funzione per ottenere CN dall'utente
 get_server_cn() {
   local cn_default="www.manzolo.it"  # Valore predefinito
   local cn
@@ -108,6 +109,18 @@ get_server_cn() {
   echo "$cn"
 }
 
+# Funzione per ottenere la password dall'utente
+get_password() {
+  local pwd
+
+  pwd=$(dialog --clear --title "Informazioni CA" \
+    --inputbox "Password chiave privata CA:" 10 60 "" 2>&1 >/dev/tty)
+  if [[ $? -ne 0 ]]; then # Controllo annullamento
+    return 1 # Fallimento
+  fi
+
+  echo "$pwd"
+}
 
 # Funzione per generare la CSR del server (modificata)
 generate_server_csr() {
