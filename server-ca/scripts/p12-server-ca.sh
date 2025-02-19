@@ -30,8 +30,11 @@ else
     -in /manzoloCA/certs/${CN_SERVER}.crt.pem \
     -certfile /manzoloCA/certs/ca-chain.crt.pem \
     -out /manzoloCA/certs/${CN_SERVER}.p12 \
+    -name "${CN_SERVER}" \
     -passout pass:${PASSWORD_SERVER} \
     -passin pass:${PASSWORD_SERVER}
-
-    echo "Server P12 generato con successo!"
+    
+    #openssl pkcs12 -info -in /manzoloCA/certs/${CN_SERVER}.p12 -passin pass:${PASSWORD_SERVER}
+    
+    msg_info "Server P12 generato con successo!"
 fi
