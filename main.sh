@@ -17,8 +17,9 @@ show_menu() {
             3 "Firma CSR Intermediate CA" \
             4 "Genera CSR Server" \
             5 "Firma CSR Server" \
-            6 "Reset" \
-            7 "Esci" \
+            6 "Genera P12 Server" \
+            7 "Reset" \
+            8 "Esci" \
             2>&1 >/dev/tty)
 
         case $choice in
@@ -38,9 +39,12 @@ show_menu() {
                 sign_server_csr
                 ;;
             6)
-                reset_env
+                generate_server_p12
                 ;;
             7)
+                reset_env
+                ;;
+            8)
                 echo "Uscita..."
                 exit 0
                 ;;

@@ -8,7 +8,7 @@ DIRECTORIES=(
 )
 
 # Estensioni dei file da cancellare
-EXTENSIONS=("csr" "key" "crt" "pem" "txt" "cnf" "old" "attr")
+EXTENSIONS=("csr" "key" "crt" "pem" "txt" "cnf" "old" "attr" "p12")
 
 # Cancella i file con le estensioni specificate
 for dir in "${DIRECTORIES[@]}"; do
