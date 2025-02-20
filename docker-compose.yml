@@ -12,6 +12,7 @@ services:
       - L_ROOT=${L_ROOT}
       - O_ROOT=${O_ROOT}
       - OU_ROOT=${OU_ROOT}
+      - ROOT=${ROOT}
 
   intermediate-ca:
     image: alpine:latest
@@ -26,6 +27,7 @@ services:
       - L_INTERMEDIATE=${L_INTERMEDIATE}
       - O_INTERMEDIATE=${O_INTERMEDIATE}
       - OU_INTERMEDIATE=${OU_INTERMEDIATE}
+      - ROOT=${ROOT}
 
   server-ca:
     image: alpine:latest
@@ -36,6 +38,7 @@ services:
       - L_SERVER=${L_SERVER}
       - O_SERVER=${O_SERVER}
       - OU_SERVER=${OU_SERVER}
+      - ROOT=${ROOT}
 
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf

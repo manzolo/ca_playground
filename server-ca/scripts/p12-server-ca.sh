@@ -19,22 +19,22 @@ function msg_error() {
 # Installa OpenSSL
 apk add --no-cache openssl
 
-if [ -f "/manzoloCA/certs/${CN_SERVER}.p12" ]; then
+if [ -f "$ROOT/certs/${CN_SERVER}.p12" ]; then
     msg_warn "Il file ${CN_SERVER}.p12 esiste. Non eseguo la generazione"
 else
     # Crea la directory per il server
-    mkdir -p /manzoloCA/certs
+    mkdir -p $ROOT/certs
 
     openssl pkcs12 -export \
-    -inkey /manzoloCA/private/${CN_SERVER}.key.pem \
-    -in /manzoloCA/certs/${CN_SERVER}.crt.pem \
-    -certfile /manzoloCA/certs/ca-chain.crt.pem \
-    -out /manzoloCA/certs/${CN_SERVER}.p12 \
+    -inkey $ROOT/private/${CN_SERVER}.key.pem \
+    -in $ROOT/certs/${CN_SERVER}.crt.pem \
+    -certfile $ROOT/certs/ca-chain.crt.pem \
+    -out $ROOT/certs/${CN_SERVER}.p12 \
     -name "${CN_SERVER}" \
     -passout pass:${PASSWORD_SERVER} \
     -passin pass:${PASSWORD_SERVER}
     
-    #openssl pkcs12 -info -in /manzoloCA/certs/${CN_SERVER}.p12 -passin pass:${PASSWORD_SERVER}
+    #openssl pkcs12 -info -in $ROOT/certs/${CN_SERVER}.p12 -passin pass:${PASSWORD_SERVER}
     if [[ $? -eq 0 ]]; then
         msg_info "${CN_SERVER}.P12 generato con successo!"
     else
