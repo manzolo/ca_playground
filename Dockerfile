@@ -5,11 +5,11 @@ FROM alpine:latest
 RUN apk add --no-cache openssl
 
 # Copia gli script
-COPY ./menu /menu
-COPY ./container /container
-COPY ./openssl_scripts/root-ca /root-ca
-COPY ./openssl_scripts/intermediate-ca /intermediate-ca
-COPY ./openssl_scripts/server-ca /server-ca
+COPY ./scripts/menu /menu
+COPY ./scripts/container /container
+COPY ./scripts/openssl_scripts/root-ca /root-ca
+COPY ./scripts/openssl_scripts/intermediate-ca /intermediate-ca
+COPY ./scripts/openssl_scripts/server-ca /server-ca
 
 # Imposta la directory di lavoro
 WORKDIR /${ROOT}

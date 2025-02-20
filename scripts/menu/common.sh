@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source $(dirname $0)/menu/input.sh
-source $(dirname $0)/menu/root.sh
-source $(dirname $0)/menu/intermediate.sh
-source $(dirname $0)/menu/server.sh
+source $(dirname $0)/scripts/menu/input.sh
+source $(dirname $0)/scripts/menu/root.sh
+source $(dirname $0)/scripts/menu/intermediate.sh
+source $(dirname $0)/scripts/menu/server.sh
 
 while IFS= read -r line; do
   # Verifica se la riga è un commento o è vuota (ignorando spazi iniziali e finali)
@@ -51,7 +51,7 @@ set_permissions() {
 }
 reset_env() {
     set_permissions
-    $(dirname $0)/menu/clean.sh || handle_error "Errore durante la pulizia"
+    $(dirname $0)/scripts/menu/clean.sh || handle_error "Errore durante la pulizia"
     mkdir -p "$DATA_DIR" || handle_error "Errore durante la creazione della directory"
     #rm -rf $OUTPUT_DATA_DIR
     #mkdir -p $OUTPUT_DATA_DIR

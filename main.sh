@@ -2,7 +2,7 @@
 
 set -e
 
-source ./menu/common.sh
+source ./scripts/menu/common.sh
 
 msg_warn "installazione prerequisiti..."
 sudo apt -yqq install dialog > /dev/null 2>&1
