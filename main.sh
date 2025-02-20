@@ -6,6 +6,8 @@ sudo apt -yqq install dialog > /dev/null 2>&1
 
 set -e
 
+docker compose up --build
+
 # Menu grafico
 show_menu() {
     while true; do

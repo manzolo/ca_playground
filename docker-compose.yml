@@ -1,10 +1,20 @@
 services:
+  # Servizio di build per creare l'immagine personalizzata
+  builder:
+    image: manzolo-ca-alpine:latest  # Nome dell'immagine creata
+    build:
+      context: .  # Directory contenente il Dockerfile
+      dockerfile: Dockerfile  # Nome del Dockerfile
+    # Non avviare questo servizio, serve solo per costruire l'immagine
+    restart: "no"
   root-ca:
-    image: alpine:latest
+    image: manzolo-ca-alpine:latest
+    depends_on:
+      - builder
     container_name: root-ca
     volumes:
       - ./config/openssl-root.cnf:/etc/ssl/openssl.cnf
-      - ./root-ca/scripts:/scripts
+      - ./openssl_scripts/root-ca/scripts:/scripts
       - ./shared-data/root-ca:/manzoloCA
     environment:
       - C_ROOT=${C_ROOT}
@@ -15,11 +25,13 @@ services:
       - ROOT=${ROOT}
 
   intermediate-ca:
-    image: alpine:latest
+    image: manzolo-ca-alpine:latest
+    depends_on:
+      - builder
     container_name: intermediate-ca
     volumes:
       - ./config/openssl-intermediate.cnf:/etc/ssl/openssl.cnf
-      - ./intermediate-ca/scripts:/scripts
+      - ./openssl_scripts/intermediate-ca/scripts:/scripts
       - ./shared-data/intermediate-ca:/manzoloCA
     environment:
       - C_INTERMEDIATE=${C_INTERMEDIATE}
@@ -30,7 +42,9 @@ services:
       - ROOT=${ROOT}
 
   server-ca:
-    image: alpine:latest
+    image: manzolo-ca-alpine:latest
+    depends_on:
+      - builder
     container_name: server-ca
     environment:
       - C_SERVER=${C_SERVER}
@@ -42,5 +56,5 @@ services:
 
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
-      - ./server-ca/scripts:/scripts
+      - ./openssl_scripts/server-ca/scripts:/scripts
       - ./shared-data/server-ca:/manzoloCA
