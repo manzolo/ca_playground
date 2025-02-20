@@ -35,6 +35,10 @@ else
     -passin pass:${PASSWORD_SERVER}
     
     #openssl pkcs12 -info -in /manzoloCA/certs/${CN_SERVER}.p12 -passin pass:${PASSWORD_SERVER}
-    
-    msg_info "Server P12 generato con successo!"
+    if [[ $? -eq 0 ]]; then
+        msg_info "${CN_SERVER}.P12 generato con successo!"
+    else
+        msg_error "Errore durante la creazione del file ${CN_SERVER}.p12"
+        exit 1 # Esci con un codice di errore
+    fi     
 fi

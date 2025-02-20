@@ -37,5 +37,10 @@ else
         -subj "/C=${C_SERVER}/ST=${ST_SERVER}/L=${L_SERVER}/O=${O_SERVER}/OU=${OU_SERVER}/CN=${CN_SERVER}/emailAddress=${EMAIL_SERVER}" \
         -passin pass:${PASSWORD_SERVER}
 
-    echo "Server CSR generata con successo!"
+    if [[ $? -eq 0 ]]; then
+        msg_info "Server CSR generata con successo!"
+    else
+        msg_error "Errore durante la generazione della Server CSR."
+        exit 1 # Esci con un codice di errore
+    fi
 fi

@@ -40,5 +40,11 @@ else
         -subj "/C=${C_ROOT}/ST=${ST_ROOT}/L=${L_ROOT}/O=${O_ROOT}/OU=${OU_ROOT}/CN=${CN_ROOT}/emailAddress=${EMAIL_ROOT}" \
         -passin pass:${PASSWORD_ROOT}
 
-    msg_warn "Root CA creata con successo!"
+    
+    if [[ $? -eq 0 ]]; then
+        msg_info "Root CA creata con successo!"
+    else
+        msg_error "Errore durante la generazione della ROOT CA."
+        exit 1 # Esci con un codice di errore
+    fi
 fi

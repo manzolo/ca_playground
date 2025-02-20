@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 NC=$'\033[0m' # No Color
 function msg_info() {
   local GREEN=$'\033[0;32m'
@@ -14,6 +12,12 @@ function msg_warn() {
 function msg_error() {
   local RED=$'\033[0;31m'
   printf "%s\n" "${RED}${*}${NC}" >&2
+}
+
+# Funzione per gestire gli errori
+handle_error() {
+    msg_error "Errore: $1" >&2
+    exit 1
 }
 
 # Installa OpenSSL
@@ -31,5 +35,10 @@ else
       -passin pass:${PASSWORD_ROOT} \
       -batch
 
-    msg_warn "Intermediate CA firmata con successo!"
+    if [[ $? -eq 0 ]]; then
+        msg_info "Intermediate CA firmata con successo!"
+    else
+        msg_error "Errore durante la firma della Intermediate CA."
+        exit 1 # Esci con un codice di errore
+    fi        
 fi

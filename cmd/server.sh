@@ -48,18 +48,21 @@ generate_server_p12() {
         return 1
     fi
 
-    copy_file "$SHARED_DATA_DIR/root-ca/certs/root-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
-    copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
-    cat "$SHARED_DATA_DIR/server-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/root-ca.crt.pem" > "$SHARED_DATA_DIR/server-ca/certs/ca-chain.crt.pem"
-    msg_warn "Generazione del p12 del server per CN: $cn"
-    
-    set_permissions
-    
-    # Passa CN al container usando variabili d'ambiente
-    docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_SERVER="$password" -e EMAIL_SERVER="" server-ca /scripts/p12-server-ca.sh 
-    docker compose stop server-ca && docker compose rm -f server-ca
-
-    set_permissions
+    if [ -z "$SHARED_DATA_DIR/server-ca/certs/intermediate-ca.crt.pem" ]; then
+        copy_file "$SHARED_DATA_DIR/root-ca/certs/root-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
+        copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
+        cat "$SHARED_DATA_DIR/server-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/root-ca.crt.pem" > "$SHARED_DATA_DIR/server-ca/certs/ca-chain.crt.pem"
+        msg_warn "Generazione del p12 del server per CN: $cn"
+        
+        set_permissions
+        
+        # Passa CN al container usando variabili d'ambiente
+        docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_SERVER="$password" -e EMAIL_SERVER="" server-ca /scripts/p12-server-ca.sh 
+        docker compose stop server-ca && docker compose rm -f server-ca
+        set_permissions
+    else
+        msg_warn "Attenzione, non è presente il file "$SHARED_DATA_DIR/root-ca/certs/root-ca.crt.pem""
+    fi
     read -n 1 -s -r -p "Press any key to continue..."
     echo
 }

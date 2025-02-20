@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 NC=$'\033[0m' # No Color
 function msg_info() {
   local GREEN=$'\033[0;32m'
@@ -20,7 +18,7 @@ function msg_error() {
 apk add --no-cache openssl
 
 if [ -f "/manzoloCA/private/intermediate-ca.key.pem" ]; then
-    msg_warn "Il file CA_INTERMEDIATE.key.pem esiste. Non eseguo la generazione"
+    msg_warn "Il file intermediate-ca.key.pem esiste. Non eseguo la generazione"
 else
     # Crea la directory per la Intermediate CA
     mkdir -p /manzoloCA/certs /manzoloCA/crl /manzoloCA/newcerts /manzoloCA/private /manzoloCA/csr
@@ -30,6 +28,13 @@ else
 
     # Genera la chiave privata della Intermediate CA
     openssl genpkey -algorithm RSA -out /manzoloCA/private/intermediate-ca.key.pem -aes256 -pass pass:${PASSWORD_INTERMEDIATE}
+    if [[ $? -eq 0 ]]; then
+        msg_info "Chiave private della Intermediate CA generata con successo!"
+    else
+        msg_error "Errore durante la generazione della chiave private della Intermediate CA."
+        exit 1 # Esci con un codice di errore
+    fi
+    
     chmod 400 /manzoloCA/private/intermediate-ca.key.pem
 
     # Genera la CSR per la Intermediate CA
@@ -39,7 +44,12 @@ else
         -subj "/C=${C_INTERMEDIATE}/ST=${ST_INTERMEDIATE}/L=${L_INTERMEDIATE}/O=${O_INTERMEDIATE}/OU=${OU_INTERMEDIATE}/CN=${CN_INTERMEDIATE}/emailAddress=${EMAIL_INTERMEDIATE}" \
         -passin pass:${PASSWORD_INTERMEDIATE}
 
-    msg_warn "Intermediate CA CSR generata con successo!"
-
+    
+    if [[ $? -eq 0 ]]; then
+        msg_info "Intermediate CA CSR generata con successo!"
+    else
+        msg_error "Errore durante la generazione della INTERMEDIATE CA."
+        exit 1 # Esci con un codice di errore
+    fi
     
 fi
