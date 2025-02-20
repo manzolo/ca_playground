@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source $(dirname $0)/cmd/input.sh
-source $(dirname $0)/cmd/root.sh
-source $(dirname $0)/cmd/intermediate.sh
-source $(dirname $0)/cmd/server.sh
+source $(dirname $0)/scripts/menu/input.sh
+source $(dirname $0)/scripts/menu/root.sh
+source $(dirname $0)/scripts/menu/intermediate.sh
+source $(dirname $0)/scripts/menu/server.sh
 
 while IFS= read -r line; do
   # Verifica se la riga è un commento o è vuota (ignorando spazi iniziali e finali)
@@ -16,7 +16,7 @@ done < .env
 
 # Variabili importanti
 CN_SERVER="${CN_SERVER:-server}"
-SHARED_DATA_DIR="${SHARED_DATA_DIR:-./shared-data}"
+DATA_DIR="${DATA_DIR:-./data}"
 OUTPUT_DATA_DIR="${OUTPUT_DATA_DIR:-./output}"
 
 NC=$'\033[0m' # No Color
@@ -47,12 +47,12 @@ copy_file() {
 # Funzione per impostare i permessi
 set_permissions() {
     echo "Impostazione dei permessi..."
-    sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
+    sudo chown -R $(id -u):$(id -g) "$DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 reset_env() {
     set_permissions
-    $(dirname $0)/cmd/clean.sh || handle_error "Errore durante la pulizia"
-    mkdir -p "$SHARED_DATA_DIR" || handle_error "Errore durante la creazione della directory"
-    rm -rf $OUTPUT_DATA_DIR
-    mkdir -p $OUTPUT_DATA_DIR
+    $(dirname $0)/scripts/menu/clean.sh || handle_error "Errore durante la pulizia"
+    mkdir -p "$DATA_DIR" || handle_error "Errore durante la creazione della directory"
+    #rm -rf $OUTPUT_DATA_DIR
+    #mkdir -p $OUTPUT_DATA_DIR
 }

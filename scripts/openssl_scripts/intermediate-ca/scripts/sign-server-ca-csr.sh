@@ -2,7 +2,7 @@
 
 set -e
 
-. ./cmd/__container.sh
+. ./container/common.sh
 
 if [ -f "$ROOT/certs/${CN_SERVER}.crt.pem" ]; then
     msg_warn "Il file ${CN_SERVER}.crt.pem esiste. Non eseguo la generazione"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./cmd/__container.sh
+. ./container/common.sh
 
 if [ -f "$ROOT/private/intermediate-ca.key.pem" ]; then
     msg_warn "Il file intermediate-ca.key.pem esiste. Non eseguo la generazione"

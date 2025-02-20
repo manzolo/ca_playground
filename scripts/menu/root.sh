@@ -54,9 +54,9 @@ sign_intermediate_ca_csr() {
         return 1
     fi
     msg_warn "Firma della CSR della Intermediate CA con la Root CA..."
-    copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.csr.pem" "$SHARED_DATA_DIR/root-ca/csr/"
+    copy_file "$DATA_DIR/intermediate-ca/certs/intermediate-ca.csr.pem" "$DATA_DIR/root-ca/csr/"
     docker compose run --remove-orphans --rm -e CN_ROOT="" -e EMAIL_ROOT="" -e PASSWORD_ROOT="$password" root-ca /scripts/sign-intermediate-ca-csr.sh
-    copy_file "$SHARED_DATA_DIR/root-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/intermediate-ca/certs/"
+    copy_file "$DATA_DIR/root-ca/certs/intermediate-ca.crt.pem" "$DATA_DIR/intermediate-ca/certs/"
     set_permissions
     read -n 1 -s -r -p "Press any key to continue..."
     echo

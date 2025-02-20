@@ -38,8 +38,8 @@ generate_server_p12() {
         msg_warn "Operazione annullata dall'utente."
         return 1 
     fi
-    if [ -f "$SHARED_DATA_DIR/server-ca/certs/$cn.p12" ]; then
-        msg_warn "Attenzione, è già presente il file $SHARED_DATA_DIR/server-ca/certs/$cn.p12"
+    if [ -f "$DATA_DIR/server-ca/certs/$cn.p12" ]; then
+        msg_warn "Attenzione, è già presente il file $DATA_DIR/server-ca/certs/$cn.p12"
         read -n 1 -s -r -p "Press any key to continue..."
         return
     fi
@@ -53,9 +53,9 @@ generate_server_p12() {
         return 1
     fi
 
-    copy_file "$SHARED_DATA_DIR/root-ca/certs/root-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
-    copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
-    cat "$SHARED_DATA_DIR/server-ca/certs/intermediate-ca.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/root-ca.crt.pem" > "$SHARED_DATA_DIR/server-ca/certs/ca-chain.crt.pem"
+    copy_file "$DATA_DIR/root-ca/certs/root-ca.crt.pem" "$DATA_DIR/server-ca/certs/"
+    copy_file "$DATA_DIR/intermediate-ca/certs/intermediate-ca.crt.pem" "$DATA_DIR/server-ca/certs/"
+    cat "$DATA_DIR/server-ca/certs/intermediate-ca.crt.pem" "$DATA_DIR/server-ca/certs/root-ca.crt.pem" > "$DATA_DIR/server-ca/certs/ca-chain.crt.pem"
     msg_warn "Generazione del p12 del server per CN: $cn"
     
     set_permissions

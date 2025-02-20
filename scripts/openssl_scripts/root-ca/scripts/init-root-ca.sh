@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -e
-. ./cmd/__container.sh
+. ./container/common.sh
 
 if [ -f "$ROOT/private/root-ca.key.pem" ]; then
     msg_warn "Il file root-ca.key.pem esiste. Non eseguo la generazione"

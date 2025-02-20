@@ -1,12 +1,16 @@
 #!/bin/bash
 
-source ./cmd/common.sh
-
-sudo apt -yqq install dialog > /dev/null 2>&1
-
 set -e
 
-docker compose up --build
+source ./scripts/menu/common.sh
+
+msg_warn "installazione prerequisiti..."
+sudo apt -yqq install dialog > /dev/null 2>&1
+
+msg_info "Creazione immagine docker"
+docker compose up --build > /dev/null 2>&1
+
+msg_warn "Avvio menu in corso..."
 
 # Menu grafico
 show_menu() {

@@ -54,14 +54,14 @@ sign_server_csr() {
         return 1
     fi
     msg_warn "Firma della CSR del server con la Intermediate CA..."
-    #ls -al "$SHARED_DATA_DIR/server-ca/csr/"
-    if [ -f "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem" ]; then
-        copy_file "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem" "$SHARED_DATA_DIR/intermediate-ca/csr/"
+    #ls -al "$DATA_DIR/server-ca/csr/"
+    if [ -f "$DATA_DIR/server-ca/csr/${cn}.csr.pem" ]; then
+        copy_file "$DATA_DIR/server-ca/csr/${cn}.csr.pem" "$DATA_DIR/intermediate-ca/csr/"
         docker compose run --remove-orphans --rm -e CN_SERVER="$cn" -e PASSWORD_INTERMEDIATE="$password" -e EMAIL_INTERMEDIATE="" -e CN_INTERMEDIATE="" intermediate-ca /scripts/sign-server-ca-csr.sh
-        copy_file "$SHARED_DATA_DIR/intermediate-ca/certs/${cn}.crt.pem" "$SHARED_DATA_DIR/server-ca/certs/"
+        copy_file "$DATA_DIR/intermediate-ca/certs/${cn}.crt.pem" "$DATA_DIR/server-ca/certs/"
         set_permissions
     else
-        msg_warn "Attenzione, non è presente il file "$SHARED_DATA_DIR/server-ca/csr/${cn}.csr.pem""
+        msg_warn "Attenzione, non è presente il file "$DATA_DIR/server-ca/csr/${cn}.csr.pem""
     fi
     read -n 1 -s -r -p "Press any key to continue..."
     echo
