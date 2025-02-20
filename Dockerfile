@@ -5,7 +5,8 @@ FROM alpine:latest
 RUN apk add --no-cache openssl
 
 # Copia gli script
-COPY ./cmd /cmd
+COPY ./menu /menu
+COPY ./container /container
 COPY ./openssl_scripts/root-ca /root-ca
 COPY ./openssl_scripts/intermediate-ca /intermediate-ca
 COPY ./openssl_scripts/server-ca /server-ca

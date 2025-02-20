@@ -2,7 +2,7 @@
 
 set -e
 
-. ./cmd/__container.sh
+. ./container/common.sh
 
 if [ -f "$ROOT/private/${CN_SERVER}.key.pem" ]; then
     msg_warn "Il file ${CN_SERVER}.key.pem esiste. Non eseguo la generazione"

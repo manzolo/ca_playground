@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./cmd/__container.sh
+. ./container/common.sh
 
 if [ -f "$ROOT/certs/intermediate-ca.crt.pem" ]; then
     msg_warn "Il file intermediate-ca.crt.pem esiste. Non eseguo la generazione"

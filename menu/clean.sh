@@ -2,9 +2,9 @@
 
 # Directory da pulire
 DIRECTORIES=(
-  "shared-data/root-ca"
-  "shared-data/intermediate-ca"
-  "shared-data/server-ca"
+  "data/root-ca"
+  "data/intermediate-ca"
+  "data/server-ca"
 )
 
 # Estensioni dei file da cancellare

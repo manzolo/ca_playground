@@ -15,7 +15,7 @@ services:
     volumes:
       - ./config/openssl-root.cnf:/etc/ssl/openssl.cnf
       - ./openssl_scripts/root-ca/scripts:/scripts
-      - ./shared-data/root-ca:/manzoloCA
+      - ./data/root-ca:/manzoloCA
     environment:
       - C_ROOT=${C_ROOT}
       - ST_ROOT=${ST_ROOT}
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./config/openssl-intermediate.cnf:/etc/ssl/openssl.cnf
       - ./openssl_scripts/intermediate-ca/scripts:/scripts
-      - ./shared-data/intermediate-ca:/manzoloCA
+      - ./data/intermediate-ca:/manzoloCA
     environment:
       - C_INTERMEDIATE=${C_INTERMEDIATE}
       - ST_INTERMEDIATE=${ST_INTERMEDIATE}
@@ -57,4 +57,4 @@ services:
     volumes:
       - ./config/openssl-server.cnf:/etc/ssl/openssl.cnf
       - ./openssl_scripts/server-ca/scripts:/scripts
-      - ./shared-data/server-ca:/manzoloCA
+      - ./data/server-ca:/manzoloCA
