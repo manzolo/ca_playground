@@ -47,7 +47,7 @@ copy_file() {
 # Funzione per impostare i permessi
 set_permissions() {
     echo "Impostazione dei permessi..."
-    sudo chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
+    ${SUDOCMD} chown -R $(id -u):$(id -g) "$SHARED_DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 reset_env() {
     set_permissions

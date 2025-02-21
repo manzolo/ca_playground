@@ -1,8 +1,7 @@
 #!/bin/bash
 
 source ./cmd/common.sh
-
-sudo apt -yqq install dialog > /dev/null 2>&1
+./cmd/depends.sh
 
 set -e
 
