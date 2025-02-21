@@ -1,1 +1,0 @@
-V	260302142110Z		1000	unknown	/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home Webserver/OU=Manzolo Webserver OU/CN=www.prova.it/emailAddress=prova@dominio.it
