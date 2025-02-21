@@ -19,6 +19,12 @@ CN_SERVER="${CN_SERVER:-server}"
 DATA_DIR="${DATA_DIR:-./data}"
 OUTPUT_DATA_DIR="${OUTPUT_DATA_DIR:-./output}"
 
+if command -v sudo &> /dev/null; then
+  export SUDOCMD="sudo"
+else
+  export SUDOCMD=""
+fi
+
 NC=$'\033[0m' # No Color
 function msg_info() {
   local GREEN=$'\033[0;32m'
@@ -46,7 +52,7 @@ copy_file() {
 
 # Funzione per impostare i permessi
 set_permissions() {
-    msg_warn "Impostazione dei permessi $DATA_DIR per $(id -u):$(id -g)..."
+    msg_warn "Impostazione dei permessi ${SUDOCMD} $DATA_DIR per $(id -u):$(id -g)..."
     ${SUDOCMD} chown -R $(id -u):$(id -g) "$DATA_DIR" || handle_error "Errore durante l'impostazione dei permessi: $?"
 }
 reset_env() {

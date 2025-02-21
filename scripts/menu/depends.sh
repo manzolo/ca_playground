@@ -1,13 +1,6 @@
 #!/bin/bash
 
 # Rileva se sudo è disponibile
-if command -v sudo &> /dev/null; then
-  export SUDOCMD="sudo"
-else
-  export SUDOCMD=""
-fi
-
-# Rileva se sudo è disponibile
 if command -v dialog &> /dev/null; then
   exit 0
 fi

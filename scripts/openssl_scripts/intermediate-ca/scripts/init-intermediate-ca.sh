@@ -25,7 +25,7 @@ else
     # Genera la CSR per la Intermediate CA
     openssl req -config /etc/ssl/openssl.cnf \
         -key $ROOT/private/intermediate-ca.key.pem \
-        -new -sha256 -out $ROOT/certs/intermediate-ca.csr.pem \
+        -new -sha256 -out $ROOT/csr/intermediate-ca.csr.pem \
         -subj "/C=${C_INTERMEDIATE}/ST=${ST_INTERMEDIATE}/L=${L_INTERMEDIATE}/O=${O_INTERMEDIATE}/OU=${OU_INTERMEDIATE}/CN=${CN_INTERMEDIATE}/emailAddress=${EMAIL_INTERMEDIATE}" \
         -passin pass:${PASSWORD_INTERMEDIATE}
 
