@@ -1,0 +1,1 @@
+V	350218142045Z		1000	unknown	/C=IT/ST=Toscana/L=Scarperia e San Piero/O=Manzolo Home/OU=Manzolo Intermediate One CA/CN=I/emailAddress=prova@dominio.it

@@ -1,9 +1,16 @@
 #!/bin/bash
 
-source ./cmd/common.sh
-./cmd/depends.sh
-
 set -e
+
+source ./scripts/menu/common.sh
+
+msg_warn "Verifica prerequisiti..."
+./scripts/menu/depends.sh
+
+msg_info "Creazione immagine docker"
+docker compose up --build > /dev/null 2>&1
+
+msg_warn "Avvio menu in corso..."
 
 # Menu grafico
 show_menu() {
